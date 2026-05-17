@@ -1,0 +1,13 @@
+.DS_Store
+Thumbs.db
+__pycache__/
+.venv/
+
+artifacts/.matplotlib/
+artifacts/message_history.json
+artifacts/message_history.db
+artifacts/message_history.db-journal
+data/message_history_test.db
+data/message_history_test.db-journal
+
+*.pyc
