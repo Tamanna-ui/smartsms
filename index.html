@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Spam Message Classifier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-left" aria-hidden="true"></div>
+  <div class="ambient ambient-right" aria-hidden="true"></div>
+
+  <div class="page-shell">
+    <header class="hero">
+      <section class="hero-copy glass-card">
+        <p class="eyebrow">Machine Learning Project</p>
+        <h1>AI Spam Message Classifier</h1>
+        <p class="hero-text">
+          A responsive college mini-project that demonstrates natural language processing,
+          TF-IDF vectorization, text classification, and clean project presentation.
+        </p>
+        <div class="hero-tags">
+          <span>NLP</span>
+          <span>TF-IDF</span>
+          <span>Spam vs Ham</span>
+          <span>Responsive UI</span>
+        </div>
+      </section>
+
+      <aside class="hero-card glass-card">
+        <p class="card-label">Project Features</p>
+        <div class="big-stat">3 Models</div>
+        <p class="card-copy">
+          Compare Naive Bayes, Logistic Regression, and SVM, then save the best model
+          along with evaluation graphs and a confusion matrix.
+        </p>
+        <a class="ghost-link" href="#flow">View Workflow</a>
+      </aside>
+    </header>
+
+    <main class="dashboard">
+      <section class="panel glass-card classifier-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Submission Summary</p>
+            <h2>What This Project Includes</h2>
+          </div>
+          <p class="section-copy">Everything needed for a 4-credit AI/ML submission with frontend polish.</p>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <h3>Text Preprocessing</h3>
+            <p>Regex cleanup, lowercase normalization, and stop-word removal.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Vectorization</h3>
+            <p>TF-IDF converts text messages into machine-readable numeric features.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Model Comparison</h3>
+            <p>Train and compare Naive Bayes, Logistic Regression, and Linear SVM.</p>
+          </article>
+          <article class="feature-card">
+            <h3>Saved Artifacts</h3>
+            <p>Store the best model, metrics JSON, confusion matrix, and comparison chart.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel glass-card metrics-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Expected Outputs</p>
+            <h2>Artifacts And Report Content</h2>
+          </div>
+          <p class="section-copy">These deliverables directly help for screenshots, viva, and final documentation.</p>
+        </div>
+
+        <div class="metrics-grid">
+          <article class="metric-card">
+            <span>Best Model</span>
+            <strong>Auto Select</strong>
+          </article>
+          <article class="metric-card">
+            <span>Confusion Matrix</span>
+            <strong>PNG</strong>
+          </article>
+          <article class="metric-card accent-card">
+            <span>Accuracy Graph</span>
+            <strong>PNG</strong>
+          </article>
+        </div>
+
+        <div class="artifact-list">
+          <article class="artifact-card">
+            <h3>Saved Model</h3>
+            <p><code>artifacts/spam_classifier.joblib</code></p>
+          </article>
+          <article class="artifact-card">
+            <h3>Metrics JSON</h3>
+            <p><code>artifacts/model_metrics.json</code></p>
+          </article>
+          <article class="artifact-card">
+            <h3>Confusion Matrix</h3>
+            <p><code>artifacts/confusion_matrix.png</code></p>
+          </article>
+          <article class="artifact-card">
+            <h3>Model Comparison</h3>
+            <p><code>artifacts/model_comparison.png</code></p>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel glass-card flow-panel" id="flow">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Workflow</p>
+            <h2>How The Classifier Works</h2>
+          </div>
+          <p class="section-copy">A simple flow you can explain clearly during evaluation.</p>
+        </div>
+
+        <div class="flow-steps">
+          <article class="step-card">
+            <span>1</span>
+            <h3>Load Dataset</h3>
+            <p>Read SMS data and normalize labels as spam or ham.</p>
+          </article>
+          <article class="step-card">
+            <span>2</span>
+            <h3>Clean Text</h3>
+            <p>Remove noise and keep important signal words for classification.</p>
+          </article>
+          <article class="step-card">
+            <span>3</span>
+            <h3>Train Models</h3>
+            <p>Evaluate multiple algorithms using the same TF-IDF pipeline.</p>
+          </article>
+          <article class="step-card">
+            <span>4</span>
+            <h3>Predict Messages</h3>
+            <p>Use the best saved model inside the Flask web interface.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart SMS Shield</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="page-shell">
+    <section class="hero-panel">
+      <div class="hero-copy">
+        <h1>Smart SMS Shield</h1>
+        <p class="hero-text">
+          A functional SMS spam classification dashboard with persistent inbox history, live predictions,
+          model metrics, and a UI built for presentation day.
+        </p>
+        <div class="hero-tags">
+          <span>Spam Detection</span>
+          <span>Persistent Inbox</span>
+          <span>Flask API</span>
+          <span>TF-IDF ML</span>
+        </div>
+      </div>
+
+      <aside class="hero-card">
+        <p class="card-label">System Status</p>
+        <div class="hero-stat">{{ "Model Ready" if model_ready else "Fallback Mode" }}</div>
+        <p class="hero-note">
+          {% if model_ready %}
+            The trained classifier is loaded. New message predictions will be stored in the inbox automatically.
+          {% else %}
+            Training artifacts were not found yet, so the app is using the built-in rule-based fallback classifier.
+          {% endif %}
+        </p>
+        <div class="hero-mini-stats">
+          <div>
+            <span>Total Messages</span>
+            <strong id="stat-total">{{ history_stats.total_messages }}</strong>
+          </div>
+          <div>
+            <span>Spam Rate</span>
+            <strong id="stat-rate">{{ "%.2f"|format(history_stats.spam_rate) }}%</strong>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <main class="dashboard-grid">
+      <section class="panel compose-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Live Classifier</p>
+            <h2>Analyze Incoming SMS</h2>
+          </div>
+          <p class="section-copy">Submit a message and the system will classify it, explain the result, and save it to the inbox.</p>
+        </div>
+
+        <form id="prediction-form" class="compose-form">
+          <label for="message">SMS Content</label>
+          <textarea id="message" name="message" rows="7" maxlength="500" placeholder="Type or paste an SMS here...">{{ submitted_message or "" }}</textarea>
+          <div class="form-actions">
+            <button type="submit" class="primary-btn">Classify & Save</button>
+          </div>
+        </form>
+
+        <article class="prediction-card {% if prediction %}prediction-{{ prediction.label }}{% else %}prediction-idle{% endif %}" id="prediction-card">
+          <div class="prediction-header">
+            <div>
+              <p class="card-label">Prediction Result</p>
+              <div class="status-row">
+                <span class="status-dot {% if prediction %}status-dot-{{ prediction.label }}{% else %}status-dot-unknown{% endif %}" id="prediction-dot"></span>
+                <h3 id="prediction-status">{{ prediction.status if prediction else "Awaiting analysis" }}</h3>
+              </div>
+            </div>
+            <div class="confidence-badge" id="prediction-confidence">
+              {% if prediction %}{{ "%.2f"|format(prediction.confidence) }}%{% else %}0.00%{% endif %}
+            </div>
+          </div>
+          <p class="prediction-message" id="prediction-message">
+            {{ prediction.message if prediction else "Submit a message to see the classifier output." }}
+          </p>
+          <p class="prediction-explanation" id="prediction-explanation">
+            {{ prediction.explanation if prediction else "Explanations and suspicious trigger words will appear here." }}
+          </p>
+          <div class="term-list" id="term-list">
+            {% if prediction and prediction.suspicious_terms %}
+              {% for term in prediction.suspicious_terms %}
+              <span class="term-chip term-chip-spam">{{ term }}</span>
+              {% endfor %}
+            {% endif %}
+            {% if prediction and prediction.safe_terms %}
+              {% for term in prediction.safe_terms %}
+              <span class="term-chip term-chip-safe">{{ term }}</span>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </article>
+      </section>
+
+      <section class="panel metrics-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Project Metrics</p>
+            <h2>Dashboard Snapshot</h2>
+          </div>
+          <p class="section-copy">These cards combine trained model metadata with live inbox statistics.</p>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-card">
+            <span>Best Model</span>
+            <strong id="model-name">{{ metrics.best_model if metrics else "Pending" }}</strong>
+          </article>
+          <article class="stat-card">
+            <span>Dataset Size</span>
+            <strong id="dataset-size">{{ metrics.dataset_size if metrics else "--" }}</strong>
+          </article>
+          <article class="stat-card">
+            <span>Spam Messages</span>
+            <strong id="spam-count">{{ history_stats.spam_count }}</strong>
+          </article>
+          <article class="stat-card">
+            <span>Safe Messages</span>
+            <strong id="ham-count">{{ history_stats.ham_count }}</strong>
+          </article>
+          <article class="stat-card">
+            <span>Needs Review</span>
+            <strong id="review-count">{{ history_stats.review_count }}</strong>
+          </article>
+          <article class="stat-card">
+            <span>Average Confidence</span>
+            <strong id="avg-confidence">{{ "%.2f"|format(history_stats.average_confidence) }}%</strong>
+          </article>
+          <article class="stat-card accent-card">
+            <span>Test Samples</span>
+            <strong id="test-size">{{ metrics.test_size if metrics else "--" }}</strong>
+          </article>
+        </div>
+
+        <div class="results-grid">
+          {% if metrics and metrics.results %}
+            {% for model_name, result in metrics.results.items() %}
+            <article class="result-card">
+              <h3>{{ model_name }}</h3>
+              <p>Accuracy: {{ "%.2f"|format(result.accuracy * 100) }}%</p>
+              <p>Precision: {{ "%.2f"|format(result.precision * 100) }}%</p>
+              <p>Recall: {{ "%.2f"|format(result.recall * 100) }}%</p>
+              <p>F1 Score: {{ "%.2f"|format(result.f1_score * 100) }}%</p>
+            </article>
+            {% endfor %}
+          {% else %}
+            <article class="result-card result-card-empty">
+              <h3>Training pending</h3>
+              <p>Run <code>python train_model.py</code> to generate saved-model metrics and evaluation outputs.</p>
+            </article>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="panel inbox-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Stored Inbox</p>
+            <h2>Recent Messages</h2>
+          </div>
+          <p class="section-copy">Messages classified by the system appear here and can be filtered for demo purposes.</p>
+        </div>
+
+        <div class="filter-row">
+          <button class="filter-chip active" type="button" data-filter="all">All</button>
+          <button class="filter-chip" type="button" data-filter="spam">Spam</button>
+          <button class="filter-chip" type="button" data-filter="ham">Not Spam</button>
+          <button class="filter-chip" type="button" data-filter="review">Needs Review</button>
+        </div>
+
+        <div class="message-list" id="message-list">
+          {% if recent_messages %}
+            {% for item in recent_messages %}
+            <article class="message-card message-card-{{ item.label }}">
+              <div class="message-topline">
+                <span class="message-badge">{{ item.status }}</span>
+                <span class="message-confidence">{{ "%.2f"|format(item.confidence) }}%</span>
+              </div>
+              <p class="message-body">{{ item.body }}</p>
+              <p class="message-meta">{{ item.source }} • {{ item.created_at }}</p>
+            </article>
+            {% endfor %}
+          {% else %}
+            <div class="empty-state" id="empty-state">
+              No messages saved yet. Classify a few samples to populate the inbox.
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="panel inbox-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-label">Batch Testing</p>
+            <h2>Upload CSV Messages</h2>
+          </div>
+          <p class="section-copy">Upload a CSV with a `message` column to test many SMS samples and inspect how trustworthy the classifier is.</p>
+        </div>
+
+        <form id="batch-form" class="compose-form" enctype="multipart/form-data">
+          <label for="batch-file">CSV File</label>
+          <input id="batch-file" name="file" type="file" accept=".csv">
+          <div class="form-actions">
+            <button type="submit" class="primary-btn">Analyze CSV</button>
+          </div>
+        </form>
+
+        <div class="batch-summary" id="batch-summary">
+          <div class="empty-state">No CSV analyzed yet.</div>
+        </div>
+
+        <div class="batch-results" id="batch-results"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    window.appState = {
+      initialMessages: {{ recent_messages | tojson }},
+    };
+  </script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
