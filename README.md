@@ -75,7 +75,7 @@ Training creates:
 python app.py
 ```
 
-Open [http://127.0.0.1:5000](http://127.0.0.1:5000)
+Open https://smart-shield-62zh.onrender.com/
 
 ## API Endpoints
 
